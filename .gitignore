@@ -1,2 +1,10 @@
 .DS_Store
 *.DS_Store
+
+# virtual environment,
+# requirements.txt is ignored temporarily.
+web_venv
+requirements.txt
+
+# pycharm
+.idea
