@@ -26,6 +26,7 @@ async def create_pool(loop, **kw):
         autocommit=kw.get('autocommit', True),
         maxsize=kw.get('maxsize', 10),
         minsize=kw.get('minsize', 1),
+        echo=kw.get('echo', False),
         loop=loop
     )
 
@@ -209,9 +210,9 @@ class Model(dict, metaclass=ModelMetaclass):
             else:
                 raise ValueError('Invalid limit value: %s' % str(limit))
         rs = await select(' '.join(sql), args)
-        return [cls(**r) for r in rs] # return cls instance for each record
+        return [cls(**r) for r in rs]  # return cls instance for each record
 
-    ## use alias '_num_'
+    # use alias '_num_'
     @classmethod
     async def findNumber(cls, selectField, where=None, args=None):
         """find number by select and where."""
@@ -223,7 +224,6 @@ class Model(dict, metaclass=ModelMetaclass):
         if len(rs) == 0:
             return None
         return rs[0]['_num_']
-
 
     @classmethod
     async def find(cls, pk):
