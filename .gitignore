@@ -1,10 +1,14 @@
 .DS_Store
 *.DS_Store
+*.pyc
+backup/
+dist/
 
-# virtual environment,
-# requirements.txt is ignored temporarily.
-web_venv
-requirements.txt
+# virtualenv
+venv3.6
 
 # pycharm
 .idea
+
+# database
+*.sql
