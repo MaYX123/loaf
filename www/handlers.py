@@ -102,6 +102,14 @@ async def index(*, page='1'):
     }
 
 
+@get('/about')
+async def about():
+    logging.debug('about')
+    return {
+        '__template__': 'about.html',
+    }
+
+
 @get('/blog/{id}')
 async def get_blog(id):
     logging.debug('get_blog: find one blog with id given')
@@ -137,12 +145,12 @@ async def signin():
 async def authenticate(*, email, passwd):
     logging.debug('authenticate')
     if not email:
-        raise APIValueError('email', 'Invalid email.')
+        raise APIValueError('email', '请输入电子邮件')
     if not passwd:
-        raise APIValueError('passwd', 'Please input password.')
+        raise APIValueError('password', '请输入密码')
     users = await User.findAll('email=?', [email])
     if len(users) == 0:
-        raise APIValueError('email', 'Email not exist.')
+        raise APIValueError('email', '该用户不存在')
     user = users[0]
     # check passwd:
     sha1 = hashlib.sha1()
@@ -152,7 +160,7 @@ async def authenticate(*, email, passwd):
     logging.debug('password from browser: %s' % sha1.hexdigest())
     logging.debug('passwd from database: %s' % user.passwd)
     if user.passwd != sha1.hexdigest():
-        raise APIValueError('passwd', 'Invalid password.')
+        raise APIValueError('password', '密码错误')
     # authenticate ok, set cookie:
     r = web.Response()
     r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age=86400, httponly=True)
@@ -181,18 +189,24 @@ async def manage():
 @get('/manage/comments')
 async def manage_comments(*, page='1'):
     logging.debug('manage_comments')
+    page_index = get_page_index(page)
+    total_comments = await Comment.findNumber('count(id)')
+    p = Page(total_comments, page_index)
     return {
         '__template__': 'manage_comments.html',
-        'page_index': get_page_index(page)
+        'page': p
     }
 
 
 @get('/manage/blogs')
 async def manage_blogs(*, page='1'):
     logging.debug('manager_blogs')
+    page_index = get_page_index(page)
+    total_blogs = await Blog.findNumber('count(id)')
+    p = Page(total_blogs, page_index)
     return {
         '__template__': 'manage_blogs.html',
-        'page_index': get_page_index(page)
+        'page': p
     }
 
 
@@ -218,9 +232,12 @@ async def manage_edit_blog(*, id):
 
 @get('/manage/users')
 async def manage_users(*, page='1'):
+    page_index = get_page_index(page)
+    total_users = await User.findNumber('count(id)')
+    p = Page(total_users, page_index)
     return {
         '__template__': 'manage_users.html',
-        'page_index': get_page_index(page)
+        'page': p
     }
 
 
@@ -306,14 +323,14 @@ _RE_SHA1 = re.compile(r'^[0-9a-f]{40}$')
 async def api_register_user(*, email, name, passwd):
     logging.debug('api_register_user')
     if not name or not name.strip():
-        raise APIValueError('name')
+        raise APIValueError('name', '请输入正确名字')
     if not email or not _RE_EMAIL.match(email):
-        raise APIValueError('email')
+        raise APIValueError('email', '请输入格式正确的email')
     if not passwd or not _RE_SHA1.match(passwd):
-        raise APIValueError('passwd')
+        raise APIValueError('password1', '密码错误')
     users = await User.findAll('email=?', [email])
     if len(users) > 0:
-        raise APIError('register:failed', 'email', 'Email is already in use.')
+        raise APIError('register:failed', 'email', '该邮件已被注册')
     uid = next_id()
     sha1_passwd = '%s:%s' % (uid, passwd)
     user = User(id=uid, name=name.strip(), email=email,

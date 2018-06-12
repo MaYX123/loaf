@@ -15,7 +15,7 @@ class Page(object):
     Page object for display pages.
     """
 
-    def __init__(self, item_count, page_index=1, page_size=5):
+    def __init__(self, item_count, page_index=1, page_size=8):
         """
         Init Pagination by item_count, page_index and page_size.
 
@@ -64,7 +64,9 @@ class Page(object):
 
 class APIError(Exception):
     """
-    The base APIError which contains error(required), data(optional) and message(optional).
+    The base APIError which contains params error(required), data(optional) and message(optional).
+    param data must be html tag attribute 'id'.
+    The params are common also used by frontend $.showFormError.
     """
     def __init__(self, error, data='', message=''):
         super(APIError, self).__init__(message)

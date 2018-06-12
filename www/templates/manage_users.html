@@ -1,31 +1,41 @@
 {% extends '__base__.html' %}
 
-{% block title %}用户{% endblock %}
+{% block title %}用户管理{% endblock %}
 
 {% block beforehead %}
 
 <script>
 
-function initVM(data) {
-    $('#vm').show();
-    var vm = new Vue({
-        el: '#vm',
-        data: {
-            users: data.users,
-            page: data.page
+function generateUserList(users) {
+    var $table =$('#tbody-user');
+    for (let user of users) {
+        if (user.admin) {
+            $tr = $table.append('<tr><td>'+user.name+'<span><i class="fas fa-key"></i>管理员</span>'
+            +'</td><td>'+'<a href="mailto:'+user.email+'" target="_top">'+user.email+'</a>'
+            +'</td><td>'+user.created_at.toDateTime()
+            +'<td class="uid" hidden>'+user.id
+            +'</td></tr>');
         }
-    });
+        else {
+            $tr = $table.append('<tr><td>'+user.name
+            +'</td><td>'+'<a href="mailto:'+user.email+'" target="_top">'+user.email+'</a>'
+            +'</td><td>'+user.created_at.toDateTime()
+            +'<td class="uid" hidden>'+user.id
+            +'</td></tr>');
+        }
+    }
 }
 
 $(function() {
+/* generate user table */
     getJSON('/api/users', {
-        page: {{ page_index }}
+        page: {{ page.page_index }}
     }, function (err, results) {
         if (err) {
             return fatal(err);
         }
         $('#loading').hide();
-        initVM(results);
+        generateUserList(results.users);
     });
 });
 
@@ -34,49 +44,39 @@ $(function() {
 {% endblock %}
 
 {% block content %}
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+    <a class="nav-link" href="/manage/comments">评论</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/manage/blogs">博文</a>
+    </li>
+    <li class="nav-item">
+    <span class="nav-link active">用户</span>
+    </li>
+</ul>
 
-    <div class="uk-width-1-1 uk-margin-bottom">
-        <div class="uk-panel uk-panel-box">
-            <ul class="uk-breadcrumb">
-                <li><a href="/manage/comments">评论</a></li>
-                <li><a href="/manage/blogs">日志</a></li>
-                <li class="uk-active"><span>用户</span></li>
-            </ul>
-        </div>
-    </div>
+<div id="error">
+    error...
+</div>
+<div id="loading">
+    loading...
+</div>
 
-    <div id="error" class="uk-width-1-1">
-    </div>
-
-    <div id="loading" class="uk-width-1-1 uk-text-center">
-        <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
-    </div>
-
-    <div id="vm" class="uk-width-1-1">
-        <table class="uk-table uk-table-hover">
-            <thead>
-                <tr>
-                    <th class="uk-width-4-10">名字</th>
-                    <th class="uk-width-4-10">电子邮件</th>
-                    <th class="uk-width-2-10">注册时间</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-repeat="user: users" >
-                    <td>
-                        <span v-text="user.name"></span>
-                        <span v-if="user.admin" style="color:#d05"><i class="uk-icon-key"></i> 管理员</span>
-                    </td>
-                    <td>
-                        <a v-attr="href: 'mailto:'+user.email" v-text="user.email"></a>
-                    </td>
-                    <td>
-                        <span v-text="user.created_at.toDateTime()"></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div v-component="pagination" v-with="page"></div>
-    </div>
+<div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">名字</th>
+          <th scope="col">电子邮件</th>
+          <th scope="col">注册时间</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-user">
+        <!-- generateUserList -->
+      </tbody>
+    </table>
+</div>
+{{ pagination('/manage/users?page=', page) }}
 
 {% endblock %}

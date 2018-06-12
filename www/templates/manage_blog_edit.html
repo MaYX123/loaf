@@ -1,15 +1,14 @@
 {% extends '__base__.html' %}
 
-{% block title %}编辑日志{% endblock %}
+{% block title %}编辑文章{% endblock %}
 
 {% block beforehead %}
-
 <script>
 
-var
-    ID = '{{ id }}',
-    action = '{{ action }}';
+var ID = '{{ id }}';
+var action = '{{ action }}';
 
+/*
 function initVM(blog) {
     var vm = new Vue({
         el: '#vm',
@@ -30,7 +29,7 @@ function initVM(blog) {
         }
     });
     $('#vm').show();
-}
+}*/
 
 $(function () {
     if (ID) {
@@ -39,17 +38,38 @@ $(function () {
                 return fatal(err);
             }
             $('#loading').hide();
-            initVM(blog);
+            $('#title').val(blog.name); /*后端代码中，title被起名为name*/
+            $('#summary').val(blog.summary);
+            $('#content').val(blog.content);
         });
     }
     else {
         $('#loading').hide();
-        initVM({
-            name: '',
-            summary: '',
-            content: ''
-        });
     }
+});
+
+$(function() {
+    var $form = $('.form-blog-editor');
+
+    $form.submit(function (e) {
+        e.preventDefault();
+
+        var title = $form.find('#title').val();
+        var summary = $form.find('#summary').val();
+        var content = $form.find('#content').val();
+        var data = {
+            name: title,
+            summary: summary,
+            content: content
+        };
+        console.log(data);
+
+        $form.postJSON(action, data, function(err, result) {
+            if (! err) {
+                return location.assign('/manage/blogs');
+            }
+        });
+    });
 });
 
 </script>
@@ -57,50 +77,30 @@ $(function () {
 {% endblock %}
 
 {% block content %}
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+    <a class="nav-link" href="/manage/comments">评论</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/manage/blogs">博文</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/manage/users">用户</a>
+    </li>
+</ul>
 
-    <div class="uk-width-1-1 uk-margin-bottom">
-        <div class="uk-panel uk-panel-box">
-            <ul class="uk-breadcrumb">
-                <li><a href="/manage/comments">评论</a></li>
-                <li><a href="/manage/blogs">日志</a></li>
-                <li><a href="/manage/users">用户</a></li>
-            </ul>
-        </div>
-    </div>
+<div id="error">error...</div>
+<div id="loading">loading...</div>
 
-    <div id="error" class="uk-width-1-1">
-    </div>
-
-    <div id="loading" class="uk-width-1-1 uk-text-center">
-        <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
-    </div>
-
-    <div id="vm" class="uk-width-2-3">
-        <form v-on="submit: submit" class="uk-form uk-form-stacked">
-            <div class="uk-alert uk-alert-danger uk-hidden"></div>
-            <div class="uk-form-row">
-                <label class="uk-form-label">标题:</label>
-                <div class="uk-form-controls">
-                    <input v-model="name" name="name" type="text" placeholder="标题" class="uk-width-1-1">
-                </div>
-            </div>
-            <div class="uk-form-row">
-                <label class="uk-form-label">摘要:</label>
-                <div class="uk-form-controls">
-                    <textarea v-model="summary" rows="4" name="summary" placeholder="摘要" class="uk-width-1-1" style="resize:none;"></textarea>
-                </div>
-            </div>
-            <div class="uk-form-row">
-                <label class="uk-form-label">内容:</label>
-                <div class="uk-form-controls">
-                    <textarea v-model="content" rows="16" name="content" placeholder="内容" class="uk-width-1-1" style="resize:none;"></textarea>
-                </div>
-            </div>
-            <div class="uk-form-row">
-                <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-save"></i> 保存</button>
-                <a href="/manage/blogs" class="uk-button"><i class="uk-icon-times"></i> 取消</a>
-            </div>
-        </form>
-    </div>
-
+<form class="form-blog-editor">
+    <div class="alert-danger invisible">此处内容不应该出现</div>
+    <label for="title">标题:</label>
+    <input type="text" id="title" class="form-control mb-3" placeholder="标题" required autofocus>
+    <label for="summary">摘要:</label>
+    <textarea id="summary" class="form-control mb-3" rows="2" placeholder="摘要" required></textarea>
+    <label for="content">内容:</label>
+    <textarea id="content" class="form-control mb-3" rows="6" placeholder="内容支持markdown语法，换行要用<br>或者隔一行，代码块用<pre><code></code></pre>。若需要语法高亮<pre class='line-number'><code class='language-python'></code></pre>" required></textarea>
+    <button class="btn btn-lg btn-primary mb-3" type="submit">保存</button>
+    <a href="/manage/blogs" class="btn btn-lg btn-outline-danger mb-3">取消</a>
+</form>
 {% endblock %}

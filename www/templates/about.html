@@ -1,0 +1,48 @@
+{% extends '__base__.html' %}
+
+{% block title %}关于{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body">
+          <h5 class="card-title">关于本站</h5>
+            <p class="card-text">本站是个人技术博客，主要发布原创博文。当前版本（2.y.z）为响应式布局，主要功能包括管理员撰写博文、后台管理、注册用户评论、markdown 编辑文章、语法高亮，推荐使用 Firefox、Chrome 浏览器。本站由 Bootstrap、jQuery、Font Awesome、Jinja2、Python 3.6、MySQL 支持搭建，部署在阿里云 ECS。源码可查看博主的 <a href="https://github.com/MaYX123/loaf" target="_blank">GitHub</a>，欢迎你 star、fork、提出bug。
+            </p>
+            <p>本站第一版源于廖雪峰老师的 <a href="https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432170876125c96f6cc10717484baea0c6da9bee2be4000" target="_blank">Python 3 教程实战</a>，由 Vue、jQuery、Jinja2、Python3.6、MySQL 搭建。博主目前更关注前端领域，但未来仍将使用 Django 重构后端。
+            </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card">
+        <img class="card-img-top" src="../static/img/2017winter.jpg" alt="2017summer">
+        <div class="card-footer">
+            <small class="text-muted">2017年年末 @上海迪士尼</small>
+        </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <img class="card-img-top" src="../static/img/2017summer.JPG" alt="2017summer">
+      <div class="card-footer">
+          <small class="text-muted">
+              2017年夏 @南京江宁
+          </small>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">关于博主</h5>
+        <p class="card-text">博主做过两年嵌入式开发，本站搭建之前对 web 开发一无所知，正是廖雪峰老师的 Python 实战，让我对 web 开发有了整体认识。第一版完成后，博主觉得前端太酷炫了，又能做设计又能写代码，于是在学了 JavaScript 后，立马计划用 React 重构前端，然而步子跨太大，就没有然后了。饭还是要一口一口吃，于是第二版用 Bootstrap 和 jQuery 重写了前端。第二版完成后才真正感受到前端领域之庞杂，仅仅用像 Bootstrap 这种傻瓜式框架是不行的。目前博主正徜徉在前端海洋中～
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

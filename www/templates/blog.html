@@ -1,21 +1,36 @@
 {% extends '__base__.html' %}
 
+{% block meta %}
+<meta name="description" content=" {{ blog.name }} ">
+{% endblock %}
+
 {% block title %}{{ blog.name }}{% endblock %}
 
 {% block beforehead %}
 
 <script>
 
+$(function() {
+    var $blog = $('#blog-post-content');
+    console.log('start');
+    $($blog).find('h2, h3, h4, h5').each(function(i, ele) {
+    $(ele).attr('id', 'h-'+i);
+    tagName = $(ele).prop('tagName');
+    $('#blog-toc').append('<a href="#'+$(ele).attr('id')+'" class="title-'+tagName+'">'+$(ele).text()+'</a>');
+    });
+});
+
 var comment_url = '/api/blogs/{{ blog.id }}/comments';
 
 $(function () {
-    var $form = $('#form-comment');
+    var $form = $('#form-comment-editor');
     $form.submit(function (e) {
         e.preventDefault();
-        $form.showFormError('');
-        var content = $form.find('textarea').val().trim();
+
+        $form.showFormError();
+        var content = $form.find('#newComment').val().trim();
         if (content==='') {
-            return $form.showFormError('请输入评论内容！');
+            return $form.showFormError({'error': 'comment', 'data': 'comment', 'message': '请输入评论内容！'});
         }
         $form.postJSON(comment_url, { content: content }, function (err, result) {
             if (err) {
@@ -30,61 +45,49 @@ $(function () {
 {% endblock %}
 
 {% block content %}
+<div class="row">
+    <div class="col-md-9 blog-main pr-5">
+        <article class="blog-post">
+            <h2 class="blog-post-title">{{ blog.name }}</h2>
+            <p class="blog-post-meta">更新于{{ blog.created_at|datetime }}</p>
+            <div id="blog-post-content">{{ blog.html_content|safe }}</div>
+        </article><!-- /.blog-post -->
 
-    <div class="uk-width-medium-1-1">
-        <article class="uk-article">
-            <h2>{{ blog.name }}</h2>
-            <p class="uk-article-meta">发表于{{ blog.created_at|datetime }}</p>
-            <p>{{ blog.html_content|safe }}</p>
-        </article>
+        <hr class="line" />
 
-        <hr class="uk-article-divider">
-
-    {% if __user__ %}
-        <h3>发表评论</h3>
-
-        <article class="uk-comment">
-            <header class="uk-comment-header">
-                <img class="uk-comment-avatar uk-border-circle" width="50" height="50" src="{{ __user__.image }}">
-                <h4 class="uk-comment-title">{{ __user__.name }}</h4>
-            </header>
-            <div class="uk-comment-body">
-                <form id="form-comment" class="uk-form">
-                    <div class="uk-alert uk-alert-danger uk-hidden"></div>
-                    <div class="uk-form-row">
-                        <textarea rows="6" placeholder="说点什么吧" style="width:100%;resize:none;"></textarea>
-                    </div>
-                    <div class="uk-form-row">
-                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-comment"></i> 发表评论</button>
-                    </div>
-                </form>
-            </div>
-        </article>
-
-        <hr class="uk-article-divider">
-    {% endif %}
-
-        <h3>最新评论</h3>
-
-        <ul class="uk-comment-list">
+        {% if __user__ %}
+        <h5 class="mb-0">Hi {{ __user__.name }}，说点什么吧</h5>
+        <form class="form-comment-editor">
+            <div class="alert-danger invisible">此处内容不应该出现</div>
+            <textarea id="newComment" class="form-control mb-3" rows="2" placeholder="评论" required></textarea>
+            <button class="btn btn-outline-primary mb-3" type="submit">发布</button>
+        </form>
+        {% endif %}
+        <h5>最新评论</h5>
+        <ul class="">
             {% for comment in comments %}
-            <li>
-                <article class="uk-comment">
-                    <header class="uk-comment-header">
-                        <img class="uk-comment-avatar uk-border-circle" width="50" height="50" src="{{ comment.user_image }}">
-                        <h4 class="uk-comment-title">{{ comment.user_name }} {% if comment.user_id==blog.user_id %}(作者){% endif %}</h4>
-                        <p class="uk-comment-meta">{{ comment.created_at|datetime }}</p>
-                    </header>
-                    <div class="uk-comment-body">
-                        {{ comment.html_content|safe }}
-                    </div>
-                </article>
+            <li class="media">
+                <img class="mr-3" src=".../64x64" alt="image">
+                <div class="media-body">
+                    <h6 class="mt-0 mb-1">
+                        {{ comment.user_name }} {% if comment.user_id==blog.user_id %}(作者){% endif %}
+                        <small><i>{{ comment.created_at|datetime }}</i></small>
+                    </h6>
+                    <p>{{ comment.html_content|safe }}</p>
+                </div>
             </li>
             {% else %}
             <p>还没有人评论...</p>
             {% endfor %}
         </ul>
+    </div><!-- /.blog-main -->
 
-    </div>
+    <aside class="col-md-3 blog-sidebar mt-3">
+        <div class="dividing-line pl-2">
+            <h5><i class="fas fa-tree"></i>&nbsp;<u>目 录</u></h5>
+            <div id="blog-toc"></div>
+        </div>
+    </aside><!-- /.blog-sidebar -->
+</div><!-- /.row -->
 
 {% endblock %}

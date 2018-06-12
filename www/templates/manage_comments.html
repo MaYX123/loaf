@@ -1,44 +1,51 @@
 {% extends '__base__.html' %}
 
-{% block title %}评论{% endblock %}
+{% block title %}评论管理{% endblock %}
 
 {% block beforehead %}
 
 <script>
 
-function initVM(data) {
-    $('#vm').show();
-    var vm = new Vue({
-        el: '#vm',
-        data: {
-            comments: data.comments,
-            page: data.page
-        },
-        methods: {
-            delete_comment: function (comment) {
-                var content = comment.content.length > 20 ? comment.content.substring(0, 20) + '...' : comment.content;
-                if (confirm('确认要删除评论“' + comment.content + '”？删除后不可恢复！')) {
-                    postJSON('/api/comments/' + comment.id + '/delete', function (err, r) {
-                        if (err) {
-                            return error(err);
-                        }
-                        refresh();
-                    });
-                }
-            }
-        }
-    });
+function generateCommentList(comments) {
+    var $table =$('#tbody-comment');
+    for (let comment of comments) {
+        $tr = $table.append('<tr><td>'+comment.user_name
+        +'</td><td class="cc"><a target="_blank" href="/blog/'+comment.blog_id+'">'+comment.content+'</a>'
+        +'</td><td>'+comment.created_at.toDateTime()
+        +'</td><td><a href="#" class="cdelete"><i class="fas fa-trash-alt"></i></a></td>'
+        +'<td class="cid" hidden>'+comment.id
+        +'</td></tr>');
+    }
+    console.log('after gcl in gcl');
 }
 
 $(function() {
+/* generate comment table */
     getJSON('/api/comments', {
-        page: {{ page_index }}
+        page: {{ page.page_index }}
     }, function (err, results) {
         if (err) {
             return fatal(err);
         }
         $('#loading').hide();
-        initVM(results);
+        generateCommentList(results.comments);
+    });
+});
+$(function() {
+/* delegate event click */
+    $('#tbody-comment').on('click', '.cdelete', function(e) {
+        e.preventDefault();
+        var cid = $(this).parent().parent().children('.cid').text();
+        var cc = $(this).parent().parent().children('.cc').text();
+        var content = cc.length > 20 ? cc.substring(0, 20) + '...' : cc;
+        if (confirm('确认要删除评论“' + content + '”？删除后不可恢复！')) {
+            postJSON('/api/comments/' + cid + '/delete', function (err, r) {
+                if (err) {
+                    return error(err);
+                }
+                refresh();
+            });
+        }
     });
 });
 
@@ -47,51 +54,40 @@ $(function() {
 {% endblock %}
 
 {% block content %}
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+    <span class="nav-link active">评论</span>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/manage/blogs">博文</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link" href="/manage/users">用户</a>
+    </li>
+</ul>
 
-    <div class="uk-width-1-1 uk-margin-bottom">
-        <div class="uk-panel uk-panel-box">
-            <ul class="uk-breadcrumb">
-                <li class="uk-active"><span>评论</span></li>
-                <li><a href="/manage/blogs">日志</a></li>
-                <li><a href="/manage/users">用户</a></li>
-            </ul>
-        </div>
-    </div>
+<div id="error">
+    error...
+</div>
+<div id="loading">
+    loading...
+</div>
 
-    <div id="error" class="uk-width-1-1">
-    </div>
+<div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">作者</th>
+          <th scope="col">内容</th>
+          <th scope="col">创建时间</th>
+          <th scope="col">操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-comment">
+        <!-- generateCommentList -->
+      </tbody>
+    </table>
+</div>
+{{ pagination('/manage/comments?page=', page) }}
 
-    <div id="loading" class="uk-width-1-1 uk-text-center">
-        <span><i class="uk-icon-spinner uk-icon-medium uk-icon-spin"></i> 正在加载...</span>
-    </div>
-
-    <div id="vm" class="uk-width-1-1" style="display:none">
-        <table class="uk-table uk-table-hover">
-            <thead>
-                <tr>
-                    <th class="uk-width-2-10">作者</th>
-                    <th class="uk-width-5-10">内容</th>
-                    <th class="uk-width-2-10">创建时间</th>
-                    <th class="uk-width-1-10">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-repeat="comment: comments" >
-                    <td>
-                        <span v-text="comment.user_name"></span>
-                    </td>
-                    <td>
-                        <span v-text="comment.content"></span>
-                    </td>
-                    <td>
-                        <span v-text="comment.created_at.toDateTime()"></span>
-                    </td>
-                    <td>
-                        <a href="#0" v-on="click: delete_comment(comment)"><i class="uk-icon-trash-o"></i>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div v-component="pagination" v-with="page"></div>
-    </div>
 {% endblock %}

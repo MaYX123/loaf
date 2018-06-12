@@ -1,85 +1,139 @@
 <!DOCTYPE html>
 <!--
 {% macro pagination(url, page) %}
-    <ul class="uk-pagination">
+    <nav aria-label="pagination">
+        <ul class="pagination">
         {% if page.has_previous %}
-            <li><a href="{{ url }}{{ page.page_index - 1 }}"><i class="uk-icon-angle-double-left"></i></a></li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url }}{{ page.page_index - 1 }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
         {% else %}
-            <li class="uk-disabled"><span><i class="uk-icon-angle-double-left"></i></span></li>
+            <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
         {% endif %}
-            <li class="uk-active"><span>{{ page.page_index }}</span></li>
+            <li class="page-item disabled"><a class="page-link" href="#"><span>{{ page.page_index }}</span></a></li>
         {% if page.has_next %}
-            <li><a href="{{ url }}{{ page.page_index + 1 }}"><i class="uk-icon-angle-double-right"></i></a></li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url }}{{ page.page_index + 1 }}" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+            </li>
         {% else %}
-            <li class="uk-disabled"><span><i class="uk-icon-angle-double-right"></i></span></li>
+            <li class="page-item disabled">
+                <a class="page-link" href="#" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+            </li>
         {% endif %}
-    </ul>
+        </ul>
+    </nav>
 {% endmacro %}
 -->
 <html>
 <head>
     <meta charset="utf-8" />
-    {% block meta %}<!-- block meta  -->{% endblock %}
-    <title>{% block title %} ? {% endblock %} - 让我们一起晃膀子</title>
-    <link rel="stylesheet" href="/static/css/uikit.min.css">
-    <link rel="stylesheet" href="/static/css/uikit.gradient.min.css">
-    <link rel="stylesheet" href="/static/css/awesome.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="Python, Javascript, react.js, HTML, CSS, web development">
+    <meta name="author" content="loaf.fun">
+    {% block meta %}
+    <meta name="description" content="Python, Javascript, react.js, HTML, CSS, web development">
+    {% endblock %}
+
+    <title>loaf.fun-{% block title %} {% endblock %}</title>
+
+    <!-- jquery放在 block beforehead前加载，否则beforehead中代码不可用，应把script代码全移入js文件-->
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/sha1.min.js"></script>
-    <script src="/static/js/uikit.min.js"></script>
-    <script src="/static/js/sticky.min.js"></script>
-    <script src="/static/js/vue.min.js"></script>
-    <script src="/static/js/awesome.js"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- blog.css is closer to elements than bootstrap.min.css, so it will override bootstrap.min.css style-->
+    <link href="/static/css/blog.css" rel="stylesheet">
+    <!-- prism - prism.css -->
+    <link href="/static/css/prism.css" rel="stylesheet" />
+
     {% block beforehead %}<!-- before head  -->{% endblock %}
 </head>
 <body>
-    <nav class="uk-navbar uk-navbar-attached uk-margin-bottom">
-        <div class="uk-container uk-container-center">
-            <a href="/" class="uk-navbar-brand">LOAF</a>
-            <ul class="uk-navbar-nav">
-                <li data-url="blogs"><a href="/"><i class="uk-icon-home"></i> 日志</a></li>
-            </ul>
-            <div class="uk-navbar-flip">
-                <ul class="uk-navbar-nav">
-                {% if __user__ %}
-                    <li class="uk-parent" data-uk-dropdown>
-                        <a href="#0"><i class="uk-icon-user"></i> {{ __user__.name }}</a>
-                        <div class="uk-dropdown uk-dropdown-navbar">
-                            <ul class="uk-nav uk-nav-navbar">
-                                <li><a href="/signout"><i class="uk-icon-sign-out"></i> 登出</a></li>
-                            </ul>
-                        </div>
+    <header class="container">
+        <nav class="blog-header navbar navbar-expand-md px-0 pb-1">
+            <a class="blog-header-logo navbar-brand" href="/">loaf.fun</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                      <a class="nav-link" href="/"><i class="fas fa-home"></i>&nbsp;首页</a>
                     </li>
-                {% else %}
-                    <li><a href="/signin"><i class="uk-icon-sign-in"></i> 登录</a></li>
-                    <li><a href="/register"><i class="uk-icon-edit"></i> 注册</a></li>
-                {% endif %}
+                    <li class="nav-item">
+                      <a class="nav-link" href="/about"><i class="fas fa-dna"></i>&nbsp;关于</a>
+                    </li>
                 </ul>
+                <ul class="navbar-nav ml-auto ">
+                    {% if __user__ %}  <!-- __user__ is for jinja2 supported by backend -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
+                                <i class="fas fa-user-astronaut"></i>
+                                 {{ __user__.name }}
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/signout"><i class="fas fa-sign-out-alt"></i>&nbsp;登出</a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/signin"><i class="fas fa-sign-in-alt"></i>&nbsp;登录</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/register"><i class="fas fa-user-plus"></i>&nbsp;注册</a>
+                        </li>
+                    {% endif %} 
+                </ul>      
             </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <div class="uk-container uk-container-center">
-        <div class="uk-grid">
-            <!-- content -->
-            {% block content %}
-            {% endblock %}
-            <!-- // content -->
-        </div>
-    </div>
+    <main role="main" class="container">
+        <!-- content -->
+        {% block content %}
+        {% endblock %}
+        <!-- // content -->
+    </main>
 
-    <div class="uk-margin-large-top" style="background-color:#eee; border-top:1px solid #ccc;">
-        <div class="uk-container uk-container-center uk-text-center">
-            <div class="uk-panel uk-margin-top uk-margin-bottom">
-                <p>
-                    <a href="http://loaf.fun/" target="_blank">loaf.fun</a>[<a href="/manage/" target="_blank">Manage</a>]
-                </p>
-                <p>
-                    <a target="_blank" href="http://www.miitbeian.gov.cn/" title="工业和信息化部ICP/IP地址/域名信息备案管理系统">苏ICP备18006268号</a>
-                </p>
-            </div>
+    <footer class="container">
+        <p>
+            <a href="https://github.com/MaYX123" target="_blank">GitHub</a>
+            <span>|</span>
+            <a href="https://segmentfault.com/u/mayx123" target="_blank">SegmentFault</a>
+            <span>|</span>
+            <a href="/">loaf.fun</a>
+            <span>|</span>
+            <a href="/manage/" target="_blank">[Manage]</a>
+        </p>
+        <p>Copyright © 2017-2018 loaf.fun | 当前版本 2.0.0 | <a target="_blank" href="http://www.miitbeian.gov.cn/" title="工业和信息化部ICP/IP地址/域名信息备案管理系统">苏ICP备18006268号</a></p>
+        <p>Powered by <a target="_blank" href="https://getbootstrap.com/" title="Bootstrap">Bootstrap</a><span>&nbsp;&amp;&nbsp;</span><a target="_blank" href="https://www.python.org/" title="Python">Python</a><span></p>
+    </footer>
 
-        </div>
-    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/popper.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/holder.min.js"></script>
+    <script defer src="/static/fonts/fontawesome-all.min.js"></script>
+    <script src="/static/js/blog.js"></script>
+    <!-- prism - prism.js -->
+    <script src="/static/js/prism.js"></script>
 </body>
 </html>

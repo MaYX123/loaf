@@ -1,36 +1,38 @@
 {% extends '__base__.html' %}
 
-{% block title %}LOAF{% endblock %}
-
-{% block beforehead %}
-
-<script>
-</script>
-
-{% endblock %}
+{% block title %}让我们一起晃膀子{% endblock %}
 
 {% block content %}
 
-    <div class="uk-width-medium-3-4">
-    {% for blog in blogs %}
-        <article class="uk-article">
-            <h2><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
-            <p class="uk-article-meta">发表于{{ blog.created_at|datetime }}</p>
-            <p>{{ blog.summary }}</p>
-            <p><a href="/blog/{{ blog.id }}">继续阅读 <i class="uk-icon-angle-double-right"></i></a></p>
-        </article>
-        <hr class="uk-article-divider">
-    {% endfor %}
-    {{ pagination('/?page=', page) }}
-    </div>
-    <div class="uk-width-medium-1-4">
-        <div class="uk-panel uk-panel-header">
-            <h3 class="uk-panel-title">更多</h3>
-            <ul class="uk-list uk-list-line">
-                <li><a target="_blank" href="https://github.com/MaYX123">GitHub</a></li>
-                <li><a target="_blank" href="https://segmentfault.com/u/mayx123/notes">segmentfault</a></li>
-            </ul>
-        </div>
-    </div>
+    <div class="row">
+        <div class="col-md-9 blog-main pr-5">
+            {% for blog in blogs %}
+                <article class="blog-post">
+                    <h2 class="blog-post-title"><a href="/blog/{{ blog.id }}">{{ blog.name }}</a></h2>
+                    <p class="blog-post-meta">更新于{{ blog.created_at|datetime }}</p>
+                    <p class="blog-post-summary">{{ blog.summary }}</p>
+                    <p><a href="/blog/{{ blog.id }}"><u>继续阅读</u></a></p>
+                </article><!-- /.blog-post -->
+                <hr class="line" />
+            {% endfor %}
+            {{ pagination('/?page=', page) }}
+        </div><!-- /.blog-main -->
+        <aside class="col-md-3 blog-sidebar mt-3">
+            <div class="dividing-line pl-2">
+                <div class="mb-3 ">
+                    <h5><i class="fas fa-heartbeat"></i>&nbsp;<u>你 好</u></h5>
+                    <p>这是一个技术博客。博主为web开发新手，目前更关注前端领域，常用Python和JavaScript。曾用C++和C做嵌入式开发。</p>
+                </div>
+                <hr class="line" />
+                <div class="mb-3">
+                    <h5><i class="fas fa-bug"></i>&nbsp;<u>更 多</u></h5>
+                    <ol class="list-unstyled">
+                        <li><a href="https://github.com/MaYX123" target="_blank">GitHub</a></li>
+                        <li><a href="https://segmentfault.com/u/mayx123" target="_blank">SegmentFault</a></li>
+                    </ol>
+                </div>
+            </div>
+        </aside><!-- /.blog-sidebar -->
+    </div><!-- /.row -->
 
 {% endblock %}

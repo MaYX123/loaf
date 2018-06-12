@@ -1,69 +1,41 @@
-<!DOCTYPE html>
-<html class="uk-height-1-1">
-<head>
-    <meta charset="utf-8" />
-    <title>登录</title>
-    <link rel="stylesheet" href="/static/css/uikit.min.css">
-    <link rel="stylesheet" href="/static/css/uikit.gradient.min.css">
-    <script src="/static/js/jquery.min.js"></script>
-    <script src="/static/js/sha1.min.js"></script>
-    <script src="/static/js/uikit.min.js"></script>
-    <script src="/static/js/vue.min.js"></script>
-    <script src="/static/js/awesome.js"></script>
-    <script>
+{% extends '__base__.html' %}
 
-$(function() {
-    var vmAuth = new Vue({
-        el: '#vm',
-        data: {
-            email: '',
-            passwd: ''
-        },
-        methods: {
-            submit: function(event) {
-                event.preventDefault();
-                var
-                    $form = $('#vm'),
-                    email = this.email.trim().toLowerCase(),
-                    data = {
-                        email: email,
-                        passwd: this.passwd==='' ? '' : CryptoJS.SHA1(email + ':' + this.passwd).toString()
-                    };
-                $form.postJSON('/api/authenticate', data, function(err, result) {
-                    if (! err) {
-                        location.assign('/');
-                    }
-                });
+{% block title %}登录{% endblock %}
+
+{% block beforehead %}
+<script>
+$(function () {
+    var $form = $('.form-signin');
+    $form.submit(function (e) {
+        e.preventDefault();
+
+        var email = $form.find('#email').val();
+        var passwd = $form.find('#password').val();
+        var data = {
+            email: email.trim().toLowerCase(),
+            passwd: passwd==='' ? '' : CryptoJS.SHA1(email + ':' + passwd).toString()
+        };
+
+        $form.postJSON('/api/authenticate', data, function(err, result) {
+            if (! err) {
+                location.assign('/');
             }
-        }
+        });
     });
 });
+</script>
+{% endblock %}
 
-    </script>
-</head>
-<body class="uk-height-1-1">
-    <div class="uk-vertical-align uk-text-center uk-height-1-1">
-        <div class="uk-vertical-align-middle" style="width: 320px">
-            <p><a href="/">返回首页</a></p>
-            <form id="vm" v-on="submit: submit" class="uk-panel uk-panel-box uk-form">
-                <div class="uk-alert uk-alert-danger uk-hidden"></div>
-                <div class="uk-form-row">
-                    <div class="uk-form-icon uk-width-1-1">
-                        <i class="uk-icon-envelope-o"></i>
-                        <input v-model="email" name="email" type="text" placeholder="电子邮件" maxlength="50" class="uk-width-1-1 uk-form-large">
-                    </div>
-                </div>
-                <div class="uk-form-row">
-                    <div class="uk-form-icon uk-width-1-1">
-                        <i class="uk-icon-lock"></i>
-                        <input v-model="passwd" name="passwd" type="password" placeholder="口令" maxlength="50" class="uk-width-1-1 uk-form-large">
-                    </div>
-                </div>
-                <div class="uk-form-row">
-                    <button type="submit" class="uk-width-1-1 uk-button uk-button-primary uk-button-large"><i class="uk-icon-sign-in"></i> 登录</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</body>
-</html>
+{% block content %}
+<div class="mx-4 my-2 px-1 py-1">
+    <form class="form-signin mx-auto py-5">
+        <div class="alert-danger invisible">此处内容不应该出现</div>
+        <label for="email">电子邮件:</label>
+        <input type="email" id="email" class="form-control mb-3" placeholder="电子邮件" required autofocus>
+        <label for="password">密码:</label>
+        <input type="password" id="password" class="form-control mb-3" placeholder="密码" required>
+        <button class="btn btn-lg btn-outline-primary btn-block mb-3" type="submit">登录</button>
+        <p class="text-center"><a href="/">返回首页</a></p>
+    </form>
+</div>
+{% endblock %}
